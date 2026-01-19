@@ -5,9 +5,23 @@
 
 Projekat je razvijen kao edukativni tutorijal sa ciljem da pokaže alternativni pristup izradi CRUD i administrativnih aplikacija, gde SPA arhitektura često uvodi nepotrebnu kompleksnost.
 
+U savremenom web razvoju često se primenjuje SPA (Single Page Application) arhitektura, gde se većina logike izvršava na klijentu, a server služi isključivo kao API koji vraća JSON podatke.
+Iako je ovaj pristup pogodan za kompleksne aplikacije, kod CRUD i administrativnih sistema često uvodi nepotrebnu složenost.
+HTMX predstavlja drugačiji pristup, poznat kao server-driven UI ili HTML over the wire, gde server direktno generiše HTML koji se prikazuje korisniku.
+
 ---
 
-## 🎯 Problem koji se rešava
+## Arhitektonski obrazac – Server-Driven UI (HTML over the wire)
+
+Aplikacija je zasnovana na server-driven UI arhitektonskom pristupu, poznatom i kao *HTML over the wire*.
+
+Za razliku od SPA arhitekture, gde server vraća JSON podatke a klijent rekonstruiše UI, u ovom pristupu server direktno generiše HTML fragmente koji se asinhrono ubacuju u postojeću stranicu.
+
+HTMX omogućava praktičnu implementaciju ovog obrasca kroz standardne HTTP zahteve, uz minimalan JavaScript i bez client-side state management-a.
+
+---
+
+##  Problem koji se rešava
 
 U savremenom razvoju web aplikacija SPA framework-i se vrlo često koriste i u situacijama kada za to realno nema potrebe.
 
@@ -29,7 +43,7 @@ Cilj ovog projekta je da pokaže kako se **interaktivnost može postići direktn
 
 ---
 
-## 💡 Izabrano rešenje – HTMX
+##  Izabrano rešenje – HTMX
 
 **HTMX** je frontend biblioteka koja omogućava slanje HTTP zahteva direktno iz HTML-a pomoću `hx-*` atributa, uz parcijalno ažuriranje delova stranice bez potpunog reload-a.
 
@@ -44,9 +58,19 @@ U kombinaciji sa **Laravel-om i Blade template-ima**, dobija se:
 Logika ostaje na serveru, dok klijent dobija samo HTML fragmente koji se direktno ubacuju u DOM.
 Ovaj pristup se često naziva **server-driven UI**, jer server ima glavnu ulogu u generisanju korisničkog interfejsa, dok klijent služi prvenstveno za prikaz i slanje korisničkih interakcija.
 
+##  Zašto HTMX
+
+HTMX je izabran jer omogućava:
+- interaktivnost bez SPA framework-a
+- zadržavanje kompletne logike na serveru
+- jednostavan i čitljiv HTML
+- izostanak client-side state management-a
+
+Ovaj pristup je naročito pogodan za aplikacije koje se zasnivaju na CRUD operacijama i administrativnim funkcionalnostima.
+
 ---
 
-## 🧰 Korišćene tehnologije
+##  Korišćene tehnologije
 
 - **Laravel (PHP)** – backend logika, routing, validacija
 - **Blade** – server-side rendering i partial views
@@ -56,7 +80,7 @@ Ovaj pristup se često naziva **server-driven UI**, jer server ima glavnu ulogu 
 
 ---
 
-## ✨ Funkcionalnosti aplikacije
+##  Funkcionalnosti aplikacije
 
 - Dodavanje taskova bez reload-a stranice
 - “Smart add” sintaksa:
@@ -73,7 +97,7 @@ Ovaj pristup se često naziva **server-driven UI**, jer server ima glavnu ulogu 
 
 ---
 
-## ⚙️ Tehničke karakteristike (HTMX u praksi)
+##  Tehničke karakteristike (HTMX u praksi)
 
 U projektu su korišćeni sledeći ključni HTMX koncepti, koji omogućavaju izradu interaktivnog korisničkog interfejsa bez SPA framework-a:
 
@@ -118,14 +142,26 @@ Server uvek vraća **HTML fragment**, koji HTMX direktno ubacuje u postojeću st
 
 ---
 
-## 🧠 Arhitektonski pristup
+##  Arhitektonski pristup u praksi
 
-Aplikacija koristi klasične HTTP metode (GET, POST, PATCH, DELETE), dok se interaktivnost postiže vraćanjem HTML fragmenata umesto JSON odgovora.  
-Na taj način se zadržava REST filozofija, uz modernu interaktivnost bez SPA složenosti.
+Na arhitektonskom nivou, aplikacija koristi klasične HTTP metode (GET, POST, PATCH, DELETE), dok se interaktivnost postiže vraćanjem HTML fragmenata umesto JSON odgovora.  
+Na ovaj način se zadržava REST filozofija, uz modernu interaktivnost bez potrebe za SPA arhitekturom.
+
+Sva poslovna logika i stanje aplikacije nalaze se na serverskoj strani (Laravel), dok HTMX služi kao mehanizam za asinhronu komunikaciju između pregledača i backend-a,omogućavajući parcijalno ažuriranje korisničkog interfejsa bez potpunog reload-a stranice.
 
 ---
 
-## 📁 Struktura projekta (pregled)
+##  Dijagram arhitekture
+
+Sledeći dijagram prikazuje tok komunikacije u server-driven UI pristupu korišćenom u aplikaciji.
+
+![Server-driven UI dijagram](images/server-driven-ui-diagram.png)
+
+Korisnički pregledač šalje HTTP zahteve pomoću HTMX-a, backend obrađuje zahteve kroz Laravel kontrolere i Blade view-ove, a zatim vraća HTML fragmente koji se parcijalno ubacuju u postojeću stranicu bez reload-a.
+
+---
+
+##  Struktura projekta (pregled)
 
 Projekat je organizovan kao klasična Laravel aplikacija, uz jasnu podelu odgovornosti:
 
@@ -143,7 +179,7 @@ Frontend ne poseduje sopstveni state niti kompleksnu poslovnu logiku, već se u 
 
 ---
 
-## ⚖️ Poređenje sa alternativama
+##  Poređenje sa alternativama
 
 | Rešenje | Prednosti | Nedostaci |
 |------|----------|----------|
@@ -156,7 +192,27 @@ HTMX je izabran jer najbolje odgovara **jednostavnim, ali interaktivnim aplikaci
 
 ---
 
-## 🚀 Pokretanje projekta (lokalno)
+## Prednosti i mane server-driven UI pristupa
+
+### Prednosti
+- Jednostavnija arhitektura u odnosu na SPA pristup
+- Nema dupliranja poslovne logike između frontenda i backenda
+- Manje zavisnosti (nema state management biblioteka)
+- Brži razvoj CRUD i administrativnih aplikacija
+- Server ima potpunu kontrolu nad UI-jem i validacijom
+- Lakše održavanje i debagovanje aplikacije
+
+### Nedostaci
+- Manje pogodan za aplikacije sa kompleksnim client-side state-om
+- Teže implementacije real-time funkcionalnosti bez dodatnih alata
+- Veća zavisnost od servera za svaku interakciju
+- Nije optimalan za aplikacije koje zahtevaju offline režim rada
+
+Ovakav balans prednosti i mana pokazuje da je server-driven UI pristup naročito pogodan za CRUD i administrativne sisteme, dok SPA arhitektura ima smisla u kompleksnijim interaktivnim aplikacijama.
+
+---
+
+##  Pokretanje projekta (lokalno)
 
 U nastavku su navedeni koraci potrebni za lokalno pokretanje aplikacije i reprodukciju demonstriranih funkcionalnosti.
 
@@ -200,11 +256,11 @@ php artisan serve
 
 ### Aplikacija je dostupna na:
 
-👉 http://127.0.0.1:8000
+ http://127.0.0.1:8000
 
 ---
 
-## 📽️ Demo
+##  Demo
 
 U okviru projekta je pripremljen i demo snimak aplikacije, koji prikazuje:
 
@@ -233,8 +289,27 @@ U okviru projekta je pripremljen i demo snimak aplikacije, koji prikazuje:
 
 ---
 
-## 🧠 Zaključak
+##  Mogućnosti daljeg razvoja
+
+Dalji razvoj aplikacije može obuhvatiti:
+
+- uvođenje autentifikacije i autorizacije korisnika
+- rad sa više lista i kategorija taskova
+- naprednije filtriranje i sortiranje
+- real-time funkcionalnosti (WebSockets ili SSE)
+- dodavanje testova (Feature i HTTP testovi)
+- alternativni frontend (SPA) kao poređenje sa server-driven UI pristupom
+
+Na ovaj način aplikacija može da se proširi bez promene osnovne arhitekture.
+
+---
+
+##  Zaključak
+
+Prikazani projekat pokazuje da je moguće izgraditi interaktivne web aplikacije bez primene SPA framework-a, korišćenjem server-driven UI pristupa.
 
 HTMX nije zamena za SPA framework-e, ali predstavlja **racionalnu i efikasnu alternativu** za CRUD i administrativne aplikacije gde je potrebna interaktivnost bez dodatne kompleksnosti.
 
 Ovim pristupom **HTML i backend ponovo imaju glavnu ulogu**, dok se JavaScript koristi samo tamo gde je zaista neophodan.
+
+Kroz praktičnu implementaciju demonstrirano je kako se klasična server-side arhitektura može unaprediti modernim alatima, čime se postiže balans između jednostavnosti, održivosti i korisničkog iskustva.
