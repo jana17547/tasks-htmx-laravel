@@ -68,6 +68,7 @@ class TaskController extends Controller
             'due_date' => $dueDate,
         ]);
 
+
         $stats = $this->buildStats();
         $toast = ['type' => 'success', 'message' => 'Task dodat ✅'];
 
